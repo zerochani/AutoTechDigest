@@ -1,0 +1,41 @@
+# 워크플로우의 이름
+name: AI News Summarizer
+
+# 언제 실행할지 결정
+on:
+  # 매일 아침 9시(UTC 기준 0시)에 자동으로 실행
+  schedule:
+    - cron: '0 0 * * *'
+  # 수동으로도 실행할 수 있도록 버튼 추가
+  workflow_dispatch:
+
+jobs:
+  build:
+    # 어떤 OS에서 실행할지 결정
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 내 코드를 GitHub 서버로 가져오기
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 파이썬 환경 설정하기
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13' # 우리가 사용한 파이썬 버전
+
+      # 3. 필요한 라이브러리 설치하기
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-generativeai notion-client feedparser python-dotenv
+
+      # 4. 파이썬 스크립트 실행하기
+      - name: Run Python script
+        # GitHub Secrets에 저장된 키들을 환경 변수로 설정
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: python main.py # 가상 환경이 아니므로 python3 대신 python 사용
