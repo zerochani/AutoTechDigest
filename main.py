@@ -169,9 +169,17 @@ def save_to_notion(title, link, summary, source, published_date):
         new_page = notion.pages.create(
             parent={"database_id": DATABASE_ID}, properties=properties
         )
-        page_url = new_page.get("url")
-        print("✅ Notion 데이터베이스에 저장 성공!")
-        return page_url  # 성공 시 페이지 URL 반환
+        page_id = new_page.get("id")
+        if page_id:
+            # ID에서 하이픈 제거
+            page_id_no_hyphen = page_id.replace("-", "")
+            # Notion 페이지 URL 형식에 맞게 조합
+            page_url = f"https://www.notion.so/{page_id_no_hyphen}"
+            print("✅ Notion 데이터베이스에 저장 성공!")
+            return page_url  # 성공 시 페이지 URL 반환
+        else:
+            print("오류: 생성된 Notion 페이지의 ID를 찾을 수 없습니다.")
+            return None
 
     except Exception as e:
         print(f"Notion 저장 중 오류가 발생했습니다: {e}")
