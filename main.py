@@ -121,7 +121,7 @@ def send_kakao_message(title, summary, link):
         },
         "buttons": [
             {
-                "title": "기사 전문 보기",
+                "title": "Notion 페이지 열기",
                 "link": {"web_url": link, "mobile_web_url": link},
             }
         ],
