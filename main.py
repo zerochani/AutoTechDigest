@@ -146,14 +146,14 @@ def send_kakao_message(title, summary, link):
 
 
 def save_to_notion(title, link, summary, source, published_date):
-    """요약된 글의 정보를 Notion 데이터베이스에 저장합니다."""
+    """요약된 글의 정보를 Notion 데이터베이스에 저장하고, 생성된 페이지의 URL을 반환합니다."""
     print("Notion에 저장을 시작합니다...")
     NOTION_API_KEY = os.getenv("NOTION_API_KEY")
     DATABASE_ID = os.getenv("NOTION_DATABASE_ID")
 
     if not NOTION_API_KEY or not DATABASE_ID:
         print("오류: Notion API 키 또는 데이터베이스 ID를 찾을 수 없습니다.")
-        return False  # 실패 시 False 반환
+        return None  # 실패 시 None 반환
 
     try:
         notion = Client(auth=NOTION_API_KEY)
@@ -166,13 +166,16 @@ def save_to_notion(title, link, summary, source, published_date):
             "게시일": {"date": {"start": published_date}},
         }
 
-        notion.pages.create(parent={"database_id": DATABASE_ID}, properties=properties)
+        new_page = notion.pages.create(
+            parent={"database_id": DATABASE_ID}, properties=properties
+        )
+        page_url = new_page.get("url")
         print("✅ Notion 데이터베이스에 저장 성공!")
-        return True  # 성공 시 True 반환
+        return page_url  # 성공 시 페이지 URL 반환
 
     except Exception as e:
         print(f"Notion 저장 중 오류가 발생했습니다: {e}")
-        return False  # 실패 시 False 반환
+        return None  # 실패 시 None 반환
 
 
 # --- 메인 실행 부분 ---
@@ -192,8 +195,8 @@ if __name__ == "__main__":
         print(ai_summary)
 
         if "실패" not in ai_summary:
-            # Notion 저장 시도 및 성공 여부 확인
-            is_saved = save_to_notion(
+            # Notion에 저장하고 생성된 페이지의 URL을 받음
+            notion_page_url = save_to_notion(
                 title=article_title,
                 link=article_link,
                 summary=ai_summary,
@@ -201,8 +204,8 @@ if __name__ == "__main__":
                 published_date=article_date,
             )
 
-            # Notion 저장이 성공했을 경우에만 카카오톡 메시지 전송
-            if is_saved:
+            # Notion 저장이 성공하여 유효한 URL이 반환되었을 경우에만 카카오톡 메시지 전송
+            if notion_page_url:
                 send_kakao_message(
-                    title=article_title, summary=ai_summary, link=article_link
+                    title=article_title, summary=ai_summary, link=notion_page_url
                 )
