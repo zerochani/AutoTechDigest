@@ -1,5 +1,5 @@
 import feedparser
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 def get_latest_article_info(rss_url):
     """RSS 피드에서 가장 최신 글의 정보(제목, 링크, 내용, 게시일)를 가져옵니다."""
@@ -18,11 +18,19 @@ def get_latest_article_info(rss_url):
     link = latest_article.link
     content_summary = latest_article.get("summary", "내용 요약 없음")
 
+    # 한국 시간(KST, UTC+9)을 정의합니다.
+    KST = timezone(timedelta(hours=9))
+
     published_time = latest_article.get("published_parsed")
     if published_time:
-        published_date = datetime(*published_time[:6]).strftime("%Y-%m-%d")
+        # 피드에서 제공된 시간을 UTC로 간주하고 KST로 변환합니다.
+        utc_time = datetime(*published_time[:6], tzinfo=timezone.utc)
+        kst_time = utc_time.astimezone(KST)
+        published_date = kst_time.strftime("%Y-%m-%d")
     else:
-        published_date = datetime.now().strftime("%Y-%m-%d")
+        # 현재 시간을 UTC로 가져와 KST로 변환합니다.
+        kst_time = datetime.now(timezone.utc).astimezone(KST)
+        published_date = kst_time.strftime("%Y-%m-%d")
 
     print("✅ 최신 글 정보 가져오기 성공!")
     return title, link, content_summary, published_date
