@@ -64,3 +64,6 @@
     ```bash
     python3 main.py
     ```
+
+##  Notion Database URL
+https://www.notion.so/2631f8b7773e8047b871c621b19bb2a1?v=2631f8b7773e80dbb94c000c85533afc
