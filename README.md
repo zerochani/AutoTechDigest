@@ -67,4 +67,6 @@
 
 ## 💻 동작 예시 (Output)
 
-![Notion Database](images/notion_database.png)
+| Notion 데이터베이스 저장 | 카카오톡 알림 |
+| :--------------------: | :-----------: |
+| <img src="images/notion_database.png" alt="Notion Database" width="400"/> | <img src="images/kakao_notification.png" alt="Kakao Notification" width="400"/> |
