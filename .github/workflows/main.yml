@@ -3,9 +3,9 @@ name: AI News Summarizer
 
 # 언제 실행할지 결정
 on:
-  # 매일 아침 9시(UTC 기준 0시)에 자동으로 실행
+  # 매일 오후 1시(UTC 기준 4시)에 자동으로 실행
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 4 * * *'
   # 수동으로도 실행할 수 있도록 버튼 추가
   workflow_dispatch:
 

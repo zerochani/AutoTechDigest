@@ -27,13 +27,12 @@ def update_kakao_token():
 def send_kakao_message(title, summary, link):
     """'나에게 보내기' API를 사용하여 카카오톡 메시지를 전송합니다."""
     print("카카오톡 메시지 전송을 시작합니다...")
-    access_token = config.KAKAO_ACCESS_TOKEN
-
+    
+    # 항상 새로운 액세스 토큰을 발급받습니다.
+    access_token = update_kakao_token()
     if not access_token:
-        access_token = update_kakao_token()
-        if not access_token:
-            print("오류: 카카오 액세스 토큰을 얻을 수 없어 메시지를 전송할 수 없습니다.")
-            return
+        print("오류: 카카오 액세스 토큰을 얻을 수 없어 메시지를 전송할 수 없습니다.")
+        return
 
     url = "https://kapi.kakao.com/v2/api/talk/memo/default/send"
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -57,13 +56,6 @@ def send_kakao_message(title, summary, link):
     data = {"template_object": json.dumps(template_object)}
 
     response = requests.post(url, headers=headers, data=data)
-
-    if response.status_code == 401:
-        print("액세스 토큰이 만료되었습니다. 갱신 후 다시 시도합니다.")
-        new_access_token = update_kakao_token()
-        if new_access_token:
-            headers["Authorization"] = f"Bearer {new_access_token}"
-            response = requests.post(url, headers=headers, data=data)
 
     if response.status_code == 200:
         print("✅ 카카오톡 메시지 전송 성공!")
