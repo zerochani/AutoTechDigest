@@ -1,11 +1,11 @@
 import google.generativeai as genai
-import config
 
-def summarize_with_gemini(content):
+
+def summarize_with_gemini(content: str, api_key: str) -> str:
     """Gemini AI를 사용해 주어진 내용을 한국어로 요약합니다."""
     print("Gemini AI로 한국어 요약을 시작합니다...")
     try:
-        genai.configure(api_key=config.GEMINI_API_KEY)
+        genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
         prompt = f"""
         당신은 해외 최신 IT 기술 기사를 한국 대학생들에게 설명해주는 친절한 전문가입니다.

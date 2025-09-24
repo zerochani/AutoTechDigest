@@ -1,26 +1,29 @@
 from notion_client import Client
-import config
+from models.article import Article
 
-def save_to_notion(title, link, summary, source, published_date):
+
+def save_to_notion(
+    article: Article, notion_api_key: str, notion_database_id: str, source: str
+) -> str | None:
     """요약된 글의 정보를 Notion 데이터베이스에 저장하고, 생성된 페이지의 URL을 반환합니다."""
     print("Notion에 저장을 시작합니다...")
-    if not config.NOTION_API_KEY or not config.NOTION_DATABASE_ID:
+    if not notion_api_key or not notion_database_id:
         print("오류: Notion API 키 또는 데이터베이스 ID를 찾을 수 없습니다.")
         return None
 
     try:
-        notion = Client(auth=config.NOTION_API_KEY)
+        notion = Client(auth=notion_api_key)
 
         properties = {
-            "제목": {"title": [{"text": {"content": title}}]},
-            "url": {"url": link},
-            "텍스트": {"rich_text": [{"text": {"content": summary}}]},
+            "제목": {"title": [{"text": {"content": article.title}}]},
+            "url": {"url": article.link},
+            "텍스트": {"rich_text": [{"text": {"content": article.summary}}]},
             "출처": {"rich_text": [{"text": {"content": source}}]},
-            "게시일": {"date": {"start": published_date}},
+            "게시일": {"date": {"start": article.published_date}},
         }
 
         new_page = notion.pages.create(
-            parent={"database_id": config.NOTION_DATABASE_ID}, properties=properties
+            parent={"database_id": notion_database_id}, properties=properties
         )
         page_id = new_page.get("id")
         if page_id:
